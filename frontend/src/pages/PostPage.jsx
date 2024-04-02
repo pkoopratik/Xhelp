@@ -67,10 +67,6 @@ const PostPage = () => {
       username="rana"
       userAvatar="/zuck-avatar.png"/>
 
-
-
-
-
     </>
   )
 }
