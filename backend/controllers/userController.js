@@ -11,7 +11,7 @@ const signupUser = async (req, res) => {
         console.log(username)//,name ,email,password)
         const user = await User.findOne({ $or: [{ email }, { username }] });
         if (user) {
-            return res.status(400).json({ message: "user alredy exist" });
+            return res.status(400).json({ error: "user alredy exist" });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -39,10 +39,9 @@ const signupUser = async (req, res) => {
         }
 
 
-
     } catch (error) {
-        res.status(500).json({ message: error.message })
-        console.log("Error in singupuser", error.message);
+        res.status(500).json({ error: error.message })
+        console.log("Error in singup user", error.message);
 
     }
 };
@@ -53,7 +52,7 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ username });
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
         if (!user || !isPasswordCorrect)
-            return res.status(400).json({ message: "Invalid username or password" });
+            return res.status(400).json({ error: "Invalid username or password" });
 
         generateTokenAndSetCookie(user._id, res);
         res.status(200).json({
@@ -64,10 +63,9 @@ const loginUser = async (req, res) => {
         });
 
 
-
     } catch (error) {
-        res.status(500).json({ message: error.message });
-        console.log("error in loginuser", error.message);
+        res.status(500).json({ error: error.message });
+        console.log("error in login user", error.message);
 
     }
 }
@@ -79,7 +77,7 @@ const logoutUser = (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
         console.log("error in logoutuser", error.message);
 
 
@@ -89,7 +87,7 @@ const followUnfollowUser = async (req, res) => {
     try {
         const { id } = req.params;
         console.log(id);
-        
+
         const userToModify = await User.findById(id);
         const currentUser = await User.findById(req.user._id);
 
@@ -111,7 +109,7 @@ const followUnfollowUser = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
         console.log("error in followumfolow", error.message);
     }
 }
@@ -144,7 +142,7 @@ const updateUser = async (req, res) => {
         res.status(200).json({ message: " user updated seceesfully", user })
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
         console.log("error in updateUser", error.message);
     }
 }
@@ -159,7 +157,7 @@ const getUserProfile = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
         console.log("error in getuserprofile", error.message);
     }
 }
