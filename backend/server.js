@@ -4,23 +4,26 @@ import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
-
+import { v2 as cloudinary } from 'cloudinary';
 
 dotenv.config();
 connectDB();
 //Mogo=mongodb+srv://pratik:<password>@xhelp.qksxiai.mongodb.net/
-const app= express();
+const app = express();
 
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 //Routes
-app.use("/api/users",userRoutes);
-app.use("/api/posts",postRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
-
-
-app.listen(PORT,()=>{console.log(`listening on post ${PORT}`)})
+app.listen(PORT, () => { console.log(`listening on post ${PORT}`) })

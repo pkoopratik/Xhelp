@@ -1,7 +1,7 @@
-import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from 'cloudinary';
+import User from "../models/userModel.js";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAdSetCookie.js";
-import { json } from "express";
 
 //Signup
 const signupUser = async (req, res) => {
@@ -60,6 +60,8 @@ const loginUser = async (req, res) => {
             name: user.name,
             email: user.email,
             username: user.username,
+            bio: user.bio,
+            profilePic: user.profilePic,
         });
 
 
@@ -115,7 +117,7 @@ const followUnfollowUser = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-    const { name, email, username, password, profilePic, bio } = req.body
+    let { name, email, username, password, profilePic, bio } = req.body
     const userId = req.user._id;
 
     try {
@@ -131,6 +133,13 @@ const updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             user.password = hashedPassword;
+        }
+        if (profilePic) {
+            if (user.profilePic) {
+                await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0])
+            }
+            const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+            profilePic = uploadedResponse.secure_url;
         }
         user.name = name || user.name;
         user.email = email || user.email;
@@ -163,4 +172,5 @@ const getUserProfile = async (req, res) => {
 }
 
 
-export { signupUser, loginUser, logoutUser, followUnfollowUser, updateUser, getUserProfile };
+export { followUnfollowUser, getUserProfile, loginUser, logoutUser, signupUser, updateUser };
+
