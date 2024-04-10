@@ -123,10 +123,10 @@ const updateUser = async (req, res) => {
     try {
         let user = await User.findById(userId);
         if (!user)
-            return res.status(400).json({ message: "user not found" });
+            return res.status(400).json({ error: "user not found" });
 
         if (req.params.id !== userId.toString()) {
-            return res.status(400).json({ message: "you cannot update othrrt users" })
+            return res.status(400).json({ error: "you cannot update othrrt users" })
         }
 
         if (password) {
@@ -161,7 +161,7 @@ const getUserProfile = async (req, res) => {
     try {
         const user = await User.findOne({ username }).select("-password").select("-updatedAt");
         if (!user)
-            return res.status(400).json({ message: "user with this username not fuunt" });
+            return res.status(400).json({ error: "user with this username not fuunt" });
         res.status(200).json(user);
 
 
