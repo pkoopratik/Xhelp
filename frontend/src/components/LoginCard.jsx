@@ -26,6 +26,7 @@ export default function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
   const setUser = useSetRecoilState(userAtom);
+  const [loading, setLoading] = useState(false);
 
   const [inputs, setInputs] = useState({
     username: "",
@@ -35,6 +36,8 @@ export default function LoginCard() {
   const showToast = useShowToast();
 
   const handleLogin = async () => {
+    
+    setLoading(true);
     console.log(inputs);
     try {
       const res = await fetch("/api/users/login", {
@@ -59,6 +62,8 @@ export default function LoginCard() {
       console.log("error  in login handle fn")
       console.log(error);
       showToast("Error", error, "error")
+    } finally {
+      setLoading(false);
     }
 
   }
@@ -110,14 +115,15 @@ export default function LoginCard() {
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText="Submitting"
+                loadingText="Logging in"
                 size="lg"
                 bg={useColorModeValue("gray.600", "gray.700")}
                 color={'white'}
                 _hover={{
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
-                onClick={handleLogin}>
+                onClick={handleLogin}
+                isLoading={loading}>
                 Login
               </Button>
             </Stack>
