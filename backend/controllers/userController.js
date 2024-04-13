@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
 import User from "../models/userModel.js";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAdSetCookie.js";
+import mongoose from "mongoose";
 
 //Signup
 const signupUser = async (req, res) => {
@@ -42,7 +43,6 @@ const signupUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message })
         console.log("Error in singup user", error.message);
-
     }
 };
 
@@ -64,7 +64,6 @@ const loginUser = async (req, res) => {
             profilePic: user.profilePic,
         });
 
-
     } catch (error) {
         res.status(500).json({ error: error.message });
         console.log("error in login user", error.message);
@@ -77,12 +76,9 @@ const logoutUser = (req, res) => {
         res.cookie("jwt", "", { maxAge: 1 });
         res.status(200).json({ message: "User logoyut seccesfully" });
 
-
     } catch (error) {
         res.status(500).json({ error: error.message });
         console.log("error in logoutuser", error.message);
-
-
     }
 }
 const followUnfollowUser = async (req, res) => {
@@ -157,9 +153,14 @@ const updateUser = async (req, res) => {
 }
 
 const getUserProfile = async (req, res) => {
-    const { username } = req.params;
+    const { query } = req.params;
     try {
-        const user = await User.findOne({ username }).select("-password").select("-updatedAt");
+        let user;
+        if (mongoose.Types.ObjectId.isValid(query)) {
+            user = await User.findOne({ _id: query }).select("-password").select("-updatedAt");
+        } else {
+            user = await User.findOne({ username: query }).select("-password").select("-updatedAt");
+        }
         if (!user)
             return res.status(400).json({ error: "user with this username not fuunt" });
         res.status(200).json(user);
@@ -170,7 +171,6 @@ const getUserProfile = async (req, res) => {
         console.log("error in getuserprofile", error.message);
     }
 }
-
 
 export { followUnfollowUser, getUserProfile, loginUser, logoutUser, signupUser, updateUser };
 
