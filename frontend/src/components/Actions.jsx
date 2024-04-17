@@ -20,8 +20,7 @@ const Actions = ({ post: post_ }) => {
 
 	const handleLikeAndUnlike = async () => {
 
-		if (!user)
-			return showToast("Error", "You must be logged in to like the post", "error");
+		if (!user) return showToast("Error", "You must be logged in to like the post", "error");
 		if (isLiking)
 			return;
 		setIsLiking(true);
@@ -42,7 +41,6 @@ const Actions = ({ post: post_ }) => {
 				setPost({ ...post, likes: post.likes.filter(id => id !== user._id) })
 			}
 			setLiked(!liked)
-
 		} catch (error) {
 			showToast("Error", error.message, "error");
 		} finally {
@@ -51,7 +49,6 @@ const Actions = ({ post: post_ }) => {
 
 	}
 	const handleReply = async () => {
-
 		if (!user) return showToast("Error", "You must be logged in to like the post", "error");
 
 		if (isReplying) return;
@@ -67,7 +64,6 @@ const Actions = ({ post: post_ }) => {
 			const data = await res.json();
 			if (data.error)
 				return showToast("Error", data.error, "error");
-
 			setPost({ ...post, replies: [...post.replies, data.reply] });
 			showToast("Success", "Reply posted successfully", "success")
 			onClose();
