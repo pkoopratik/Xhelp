@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAdSetCookie.js";
 import mongoose from "mongoose";
 
@@ -144,6 +145,20 @@ const updateUser = async (req, res) => {
         user.bio = bio || user.bio;
 
         user = await user.save();
+
+        await Post.updateMany(
+            { "replies.userId": userId },
+            {
+                $set: {
+                    "replies.$[reply].username": user.username,
+                    "replies.$[reply].userProfilePic": user.userProfilePic,
+                }
+            },
+            {
+                arrayFilters: [{ "reply.userId": userId }]
+            }
+        )
+        
         res.status(200).json({ message: " user updated seceesfully", user })
 
     } catch (error) {
