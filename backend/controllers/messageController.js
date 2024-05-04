@@ -59,7 +59,7 @@ async function getMessages(req, res) {
 
         const messages = await Message.find({
             conversationId: conversation._id
-        }).sort({ createdAt: -1 })
+        }).sort({ createdAt: 1 })
 
         res.status(200).json(messages);
 
@@ -83,6 +83,12 @@ async function getConversations(req, res) {
         if (!conversations) {
             return res.status(404).json({ error: "conversation not found" });
         }
+
+        conversations.forEach(conversation => {
+            conversation.participants = conversation.participants.filter(
+                participants => participants._id.toString() !== userId.toString()
+            )
+        })
 
         res.status(200).json(conversations);
 
