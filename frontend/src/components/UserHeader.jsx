@@ -7,15 +7,15 @@ import { Menu, MenuButton, MenuItem, MenuList, useToast, Portal, Button } from '
 import { useRecoilValue } from 'recoil';
 import userAtom from '../atoms/userAtom';
 import { Link } from 'react-router-dom';
+import useFollowUnfollow from '../hooks/useFollowUnfollow';
 import useShowToast from '../hooks/useShowToast';
-import { useState } from 'react';
 
 const UserHeader = ({ user }) => {
     const showToast = useShowToast();
     //user logged in
     const currentUser = useRecoilValue(userAtom);
-    const [following, setFollowing] = useState(user.followers.includes(currentUser?._id));
-    const [updating, setUpdating] = useState(false);
+    const { handleFollowUnfollow, following, updating } = useFollowUnfollow(user);
+
     const copyUrl = () => {
         const currentUrl = window.location.href;
         navigator.clipboard.writeText(currentUrl).then(() => {
@@ -29,45 +29,7 @@ const UserHeader = ({ user }) => {
             });
         })
     }
-    const handleFollowUnfollow = async () => {
-        if (!currentUser) {
-            showToast("Error", "Please Login to follow", "error");
-            return;
-        }
-        if (updating)
-            return;
-        setUpdating(true);
 
-        try {
-            const res = await fetch(`/api/users/follow/${user._id}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const data = await res.json();
-            if (data.error) {
-                showToast("Error", data.error, "error");
-                return;
-            }
-            if (following) {
-                showToast("Success", `Unfollowed ${user.name}`, "success");
-                user.followers.pop();//simulte
-            } else {
-                showToast("Success", `Followed ${user.name}`, "success");
-                user.followers.push(currentUser?._id);//simute
-
-            }
-            setFollowing(!following);
-            console.log(data);
-
-        } catch (error) {
-            showToast("error", error, "error");
-
-        } finally {
-            setUpdating(false);
-        }
-    };
     return (
         <VStack gap={4} alignItems={"start"}>
             <Flex justifyContent={"space-between"} w={"full"}>
