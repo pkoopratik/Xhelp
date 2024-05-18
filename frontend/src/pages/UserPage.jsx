@@ -20,6 +20,7 @@ const UserPage = () => {
   useEffect(() => {
 
     const getPosts = async () => {
+      if (!user) return;
 
       setFetchingPosts(true);
 
@@ -40,7 +41,7 @@ const UserPage = () => {
     }
 
     getPosts();
-  }, [username, showToast, setPosts]);
+  }, [username, showToast, setPosts, user]);
   console.log("post is here", posts);
 
   if (!user && loading) {
