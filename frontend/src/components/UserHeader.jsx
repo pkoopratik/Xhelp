@@ -11,15 +11,16 @@ import useFollowUnfollow from '../hooks/useFollowUnfollow';
 import useShowToast from '../hooks/useShowToast';
 
 const UserHeader = ({ user }) => {
-    const showToast = useShowToast();
+    const toast = useToast();
     //user logged in
     const currentUser = useRecoilValue(userAtom);
     const { handleFollowUnfollow, following, updating } = useFollowUnfollow(user);
+    const followersUrl = `/${user.username}/followers`;
+    const followingUrl = `/${user.username}/following`
 
     const copyUrl = () => {
         const currentUrl = window.location.href;
         navigator.clipboard.writeText(currentUrl).then(() => {
-            // console.log("url copeied");
             toast({
                 title: "Success.",
                 status: "success",
@@ -36,9 +37,9 @@ const UserHeader = ({ user }) => {
                 <Box>
                     <Text fontSize={"2xl"} fontWeight={"bold"}>{user.name}</Text>
                     <Flex gap={2} alignItems={"center"}>
-                        <Text fontSize={"sm"}>{user.username}</Text>
+                        <Text fontSize={"sm"} fontWeight={"bold"}>{user.username}</Text>
                         <Text fontSize={"xs"} bg={"gray.dark"} color={"gray.light"} p={1} borderRadius={"full"}>
-                            threds.net
+                            Xhelp.net
                         </Text>
                     </Flex>
                 </Box>
@@ -80,10 +81,13 @@ const UserHeader = ({ user }) => {
 
             <Flex w={"full"} justifyContent={"space-between"}>
                 <Flex gap={2} alignItems={"center"}>
-
-                    <Text color={"gray.light"}> {user.followers.length} followers</Text>
+                    <Link as={RouterLink} to={followersUrl}  >
+                        <Text color={"gray.light"}> {user.followers.length} followers</Text>
+                    </Link>
                     <Box w="1" h="1" bg={"gray.light"} borderRadius={"full"}></Box>
-                    <Link color={"gray.light"}>instgram.com</Link>
+                    <Link as={RouterLink} to={followingUrl}  >
+                        <Text color={"gray.light"}> {user.following.length} following</Text>
+                    </Link>
                 </Flex>
                 <Flex>
                     <Box className='icon-container'>
@@ -109,11 +113,11 @@ const UserHeader = ({ user }) => {
 
             <Flex w={"full"}>
                 <Flex flex={1} borderBottom={"1.5px solid white"} justifyContent={"center"} pb="3" cursor={"pointer"}>
-                    <Text fontWeight={"bold"}>Threads</Text>
+                    <Text fontWeight={"bold"}>Posts</Text>
 
                 </Flex>
                 <Flex flex={1} borderBottom={"1px solid gray"} justifyContent={"center"} pb="3" cursor={"pointer"} color={"gray.light"}>
-                    <Text fontWeight={"bold"}>Replies</Text>
+                    <Text fontWeight={"bold"}></Text>
 
                 </Flex>
 

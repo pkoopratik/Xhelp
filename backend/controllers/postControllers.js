@@ -145,6 +145,35 @@ const getFeed = async (req, res) => {
     }
 }
 
+const getTrending = async (req, res) => {
+    try {
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const trendingPosts = await Post.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: sevenDaysAgo }
+                }
+            },
+            {
+                $addFields: {
+                    likesCount: { $size: "$likes" }
+                }
+            },
+            {
+                $sort: { likesCount: -1 }
+            }
+        ]);
+
+        res.status(200).json(trendingPosts);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+        console.log("Error in Trending", error.message);
+    }
+}
+
 const getUserPosts = async (req, res) => {
 
     const { username } = req.params;
@@ -164,4 +193,4 @@ const getUserPosts = async (req, res) => {
 
 }
 
-export { createPost, getPost, deletePost, likeUnlikePost, replyToPost, getFeed, getUserPosts };
+export { createPost, getPost, deletePost, likeUnlikePost, replyToPost, getFeed, getTrending, getUserPosts };

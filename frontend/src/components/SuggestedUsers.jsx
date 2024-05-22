@@ -20,7 +20,6 @@ const SuggestedUsers = () => {
                 }
                 SetSuggestedUsers(data);
 
-
             } catch (error) {
                 showToast("Error", error.message, "error")
 
@@ -31,12 +30,11 @@ const SuggestedUsers = () => {
         getSuggestedUsers();
 
     }, [showToast]);
-    
+
     return (
         <>
             <Text mb={4} fontWeight={"bold"}>
                 Suggested Users
-
             </Text>
 
             <Flex direction={"column"} gap={4}>

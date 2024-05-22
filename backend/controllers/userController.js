@@ -13,7 +13,7 @@ const signupUser = async (req, res) => {
         console.log(username)//,name ,email,password)
         const user = await User.findOne({ $or: [{ email }, { username }] });
         if (user) {
-            return res.status(400).json({ error: "user alredy exist" });
+            return res.status(400).json({ error: "user already exist" });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -78,11 +78,11 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
     try {
         res.cookie("jwt", "", { maxAge: 1 });
-        res.status(200).json({ message: "User logoyut seccesfully" });
+        res.status(200).json({ message: "User logout successfully" });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
-        console.log("error in logoutuser", error.message);
+        console.log("Error in logout user", error.message);
     }
 }
 const followUnfollowUser = async (req, res) => {
@@ -94,7 +94,7 @@ const followUnfollowUser = async (req, res) => {
         const currentUser = await User.findById(req.user._id);
 
         if (id === req.user._id.toString())
-            return res.status(400).json({ message: "you cant follow same user yourself youare" });
+            return res.status(400).json({ error: "you cant follow yourself" });
 
         const isFollowing = currentUser.following.includes(id);
         if (isFollowing) {
@@ -102,17 +102,17 @@ const followUnfollowUser = async (req, res) => {
             await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } });
             await User.findByIdAndUpdate(id, { $pull: { followers: req.user._id } });
 
-            res.status(200).json({ message: "user unfollowed suceesfully" })
+            res.status(200).json({ message: "user unfollowed successfully" })
 
         } else {
             await User.findByIdAndUpdate(req.user._id, { $push: { following: id } });
             await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
-            res.status(200).json({ message: "user followed suceesfully" })
+            res.status(200).json({ message: "user followed successfully" })
         }
 
     } catch (error) {
         res.status(500).json({ error: error.message });
-        console.log("error in followumfolow", error.message);
+        console.log("error in followunfollow", error.message);
     }
 }
 
@@ -162,7 +162,7 @@ const updateUser = async (req, res) => {
             }
         )
 
-        res.status(200).json({ message: " user updated seceesfully", user })
+        res.status(200).json({ message: " user updated successfully", user })
 
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -219,6 +219,42 @@ const getSuggestedUser = async (req, res) => {
 
 }
 
+const getFollower = async (req, res) => {
+    try {
+        //To get list of all followers of a user
+        const username = req.params.username;
+        const usersFollowYou = await User.findOne({
+            username: username
+        });
+
+        const users = await User.aggregate([{ $sample: { size: 100000 } }]);
+        const filteredUsers = users.filter((user) => usersFollowYou.followers.includes(user._id));
+        filteredUsers.forEach((user) => (user.password = null));
+
+        res.status(200).json(filteredUsers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const getFollowing = async (req, res) => {
+
+    try {
+        //To get list of users that user follows followers 
+
+        const username = req.params.username;
+        const usersFollowYou = await User.findOne({ username: username })
+        const users = await User.aggregate([{ $sample: { size: 100000 } }]);
+
+        const filteredUsers = users.filter((user) => usersFollowYou.following.includes(user._id));
+        users.forEach((user) => (user.password = null));
+        res.status(200).json(filteredUsers);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 const freezeAccount = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -233,5 +269,5 @@ const freezeAccount = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
-export { followUnfollowUser, getSuggestedUser, getUserProfile, loginUser, logoutUser, signupUser, updateUser, freezeAccount };
+export { followUnfollowUser, getSuggestedUser, getFollower, getFollowing, getUserProfile, loginUser, logoutUser, signupUser, updateUser, freezeAccount };
 
